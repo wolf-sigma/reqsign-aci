@@ -1,0 +1,127 @@
+.idea
+*/target
+docker/backend-web/stage
+deps/polaris-rs/target/target
+tools/seed_polaris/target
+polaris
+deps/snowflake-connector-rs
+/deps/snowflake-rs/
+.build
+.cache
+/playground/
+*/.venv
+*/venv/
+.venv
+dataflow/target
+target
+.DS_STORE
+*/.DS_STORE
+*/.idea/
+node_modules/
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Log files and directories
+*.log
+logs/
+**/logs/
+/crates/bin-*/logs/
+
+# Debug files
+/crates/context-gem-rs/debug/
+
+.tree
+.swp
+
+# Python cache directories
+**/__pycache__/
+*.pyc
+*.pyo
+lakekeeper/__pycache__/util.cpython-311.pyc
+
+# Node modules
+/frontend-new/build
+/frontend-new/node_modules
+/frontend-web/build
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+.t
+
+# Python virtual environments
+/crates/bin-quark-worker/.venv/
+
+# ONNX models and data
+/crates/quarks/onnx/src/common/wtpsplit/sat-3l-sm-optimized.onnx
+/crates/quarks/onnx/src/common/models/
+
+# Planning and reference files
+plans.md
+reference.md
+.DS_STORE
+*/.DS_STORE
+*/.idea/
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Log files and directories
+*.log
+logs/
+**/logs/
+/crates/bin-*/logs/
+
+# Debug files
+/crates/context-gem-rs/debug/
+
+# Python cache directories
+**/__pycache__/
+*.pyc
+*.pyo
+lakekeeper/__pycache__/util.cpython-311.pyc
+
+# Node modules
+/crates/frontend-web/node_modules
+/frontend-new/node_modules
+/frontend-new/build
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+.t
+
+# Python virtual environments
+/crates/bin-quark-worker/.venv/
+
+# ONNX models and data
+/crates/quarks/onnx/src/common/wtpsplit/sat-3l-sm-optimized.onnx
+/crates/quarks/onnx/src/common/wtpsplit/model_optimized.onnx
+/crates/quarks/onnx/src/common/models/
+
+# Planning and reference files
+plans.md
+reference.md
+crates/bin-quark-worker/sample_data/winter_olympics_2022.csv
+crates/bin-quark-rest/lancedb
+tools/trino/cli/trino-458
+crates/context-gem-rs/src/_reference/1/QuarkLabsPitch.pdf
+/crates/lib-quark-core/src/leader/.scrap/*
+/.data/
+/crates/bin-quark-worker/.models/
+crates/bin-quark-rest/.env
+.quark/
+PLANS.md

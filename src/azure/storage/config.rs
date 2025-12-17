@@ -91,6 +91,7 @@ impl Config {
     /// Load config from env.
     pub fn from_env(mut self) -> Self {
         let envs = env::vars().collect::<HashMap<_, _>>();
+        log::info!("Reading Azure Config from Env");
 
         // federated_token can be loaded from both `AZURE_FEDERATED_TOKEN` and `AZURE_FEDERATED_TOKEN_FILE`.
         if let Some(v) = envs.get(AZURE_FEDERATED_TOKEN_FILE) {

@@ -125,3 +125,5 @@ crates/context-gem-rs/src/_reference/1/QuarkLabsPitch.pdf
 crates/bin-quark-rest/.env
 .quark/
 PLANS.md
+
+testdata/**

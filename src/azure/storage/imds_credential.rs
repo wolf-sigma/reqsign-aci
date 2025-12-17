@@ -3,6 +3,7 @@ use std::str;
 use http::HeaderValue;
 use http::Method;
 use http::Request;
+use log::debug;
 use reqwest::Client;
 use reqwest::Url;
 use serde::Deserialize;
@@ -17,6 +18,12 @@ const MSI_ENDPOINT: &str = "http://169.254.169.254/metadata/identity/oauth2/toke
 /// See <https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=portal,http#using-the-rest-protocol>
 pub async fn get_access_token(resource: &str, config: &Config) -> anyhow::Result<AccessToken> {
     let endpoint = config.endpoint.as_deref().unwrap_or(MSI_ENDPOINT);
+    debug!(
+        "reqsign IMDS: endpoint={}, msi_secret_set={}, client_id={:?}",
+        endpoint,
+        config.msi_secret.is_some(),
+        config.client_id.as_deref()
+    );
     let mut query_items = vec![("api-version", MSI_API_VERSION), ("resource", resource)];
 
     match (

@@ -7,6 +7,7 @@ use log::{debug, info};
 use reqwest::Client;
 use reqwest::Url;
 use serde::Deserialize;
+use tracing::instrument;
 
 use super::config::Config;
 
@@ -16,8 +17,16 @@ const MSI_ENDPOINT: &str = "http://localhost:12356/msi/token";
 /// Gets an access token for the specified resource and configuration.
 ///
 /// See <https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity?tabs=portal,http#using-the-rest-protocol>
+#[instrument]
 pub async fn get_access_token(resource: &str, config: &Config) -> anyhow::Result<AccessToken> {
-    let endpoint = config.endpoint.as_deref().unwrap_or(MSI_ENDPOINT);
+    let mut config = config.clone();
+    if let Some(sec) = config.msi_secret {
+        
+    }
+    let endpoint = config.endpoint.as_deref().unwrap_or_else(|| {
+        tracing::warn!("MSI_ENDPOINT not set, falling back to {MSI_ENDPOINT}");
+        MSI_ENDPOINT
+    });
     debug!(
         "reqsign IMDS: endpoint={}, msi_secret_set={}, client_id={:?}",
         endpoint,

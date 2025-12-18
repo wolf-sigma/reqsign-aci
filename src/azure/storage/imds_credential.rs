@@ -73,6 +73,8 @@ pub async fn get_access_token(resource: &str, config: &Config) -> anyhow::Result
         return Err(anyhow::anyhow!("Failed to get token from IMDS endpoint"));
     }
 
+    tracing::info!("Response: {rsp_body}");
+
     let token: AccessToken = serde_json::from_str(&rsp_body)?;
 
     Ok(token)

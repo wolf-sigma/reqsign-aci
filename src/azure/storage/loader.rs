@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 use anyhow::Result;
+use anyhow::anyhow;
 use tracing::instrument;
 
 use crate::time::{now, parse_rfc3339};
@@ -87,7 +88,10 @@ impl Loader {
         let expires_on = if token.expires_on.is_empty() {
             now() + chrono::TimeDelta::try_minutes(10).expect("in bounds")
         } else {
-            parse_rfc3339(&token.expires_on)?
+            //parse_rfc3339(&token.expires_on)?
+            chrono::DateTime::from_timestamp(token.expires_on.parse::<i64>()?, 0).ok_or(anyhow!(
+                "Couldn't parse expires_on from response: {}", token.expires_on
+            ))?
         };
         let cred = Some(Credential::BearerToken(token.access_token, expires_on));
 

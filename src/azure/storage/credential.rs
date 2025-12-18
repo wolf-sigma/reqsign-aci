@@ -1,4 +1,5 @@
 use crate::time::DateTime;
+use tracing::instrument;
 
 /// Credential that holds the access_key and secret_key.
 #[derive(Clone)]
@@ -23,6 +24,7 @@ pub enum Credential {
 
 impl Credential {
     /// is current cred is valid?
+    #[instrument(skip(self))]
     pub fn is_valid(&self) -> bool {
         if self.is_empty() {
             return false;
@@ -37,6 +39,7 @@ impl Credential {
         true
     }
 
+    #[instrument(skip(self))]
     fn is_empty(&self) -> bool {
         match self {
             Credential::SharedKey(account_name, account_key) => {

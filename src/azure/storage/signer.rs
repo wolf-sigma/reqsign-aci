@@ -9,6 +9,7 @@ use anyhow::Result;
 use http::header::*;
 use log::debug;
 use percent_encoding::percent_encode;
+use tracing::instrument;
 
 use super::super::constants::*;
 use super::credential::Credential;
@@ -32,6 +33,7 @@ pub struct Signer {
 
 impl Signer {
     /// Create a signer.
+    #[instrument]
     pub fn new() -> Self {
         Self::default()
     }
@@ -48,6 +50,7 @@ impl Signer {
         self
     }
 
+    #[instrument]
     fn build(
         &self,
         req: &mut impl SignableRequest,
@@ -142,6 +145,7 @@ impl Signer {
     ///     Ok(())
     /// }
     /// ```
+    #[instrument]
     pub fn sign(&self, req: &mut impl SignableRequest, cred: &Credential) -> Result<()> {
         let mut ctx = self.build(req, SigningMethod::Header, cred)?;
 
@@ -152,6 +156,7 @@ impl Signer {
     }
 
     /// Signing request with query.
+    #[instrument]
     pub fn sign_query(
         &self,
         req: &mut impl SignableRequest,
@@ -190,6 +195,7 @@ impl Signer {
 /// ## Reference
 ///
 /// - [Blob, Queue, and File Services (Shared Key authorization)](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-with-shared-key)
+#[instrument]
 fn string_to_sign(ctx: &mut SigningContext, ak: &str, now: DateTime) -> Result<String> {
     let mut s = String::with_capacity(128);
 
@@ -229,6 +235,7 @@ fn string_to_sign(ctx: &mut SigningContext, ak: &str, now: DateTime) -> Result<S
 /// ## Reference
 ///
 /// - [Constructing the canonicalized headers string](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-with-shared-key#constructing-the-canonicalized-headers-string)
+#[instrument]
 fn canonicalize_header(ctx: &mut SigningContext, now: DateTime) -> Result<String> {
     ctx.headers
         .insert(X_MS_DATE, format_http_date(now).parse()?);
@@ -243,6 +250,7 @@ fn canonicalize_header(ctx: &mut SigningContext, now: DateTime) -> Result<String
 /// ## Reference
 ///
 /// - [Constructing the canonicalized resource string](https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-with-shared-key#constructing-the-canonicalized-resource-string)
+#[instrument]
 fn canonicalize_resource(ctx: &mut SigningContext, ak: &str) -> String {
     if ctx.query.is_empty() {
         return format!("/{}{}", ak, ctx.path);

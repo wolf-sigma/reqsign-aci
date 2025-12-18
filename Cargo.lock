@@ -2009,6 +2009,7 @@ dependencies = [
  "test-case",
  "tokio",
  "toml",
+ "tracing",
 ]
 
 [[package]]

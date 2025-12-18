@@ -8,7 +8,9 @@ use http::uri::Scheme;
 use http::HeaderMap;
 use http::HeaderValue;
 use http::Method;
+use tracing::instrument;
 
+#[derive(Debug)]
 pub struct SigningContext {
     pub method: Method,
     pub scheme: Scheme,
@@ -19,11 +21,13 @@ pub struct SigningContext {
 }
 
 impl SigningContext {
+    #[instrument]
     pub fn path_percent_decoded(&self) -> Cow<str> {
         percent_encoding::percent_decode_str(&self.path).decode_utf8_lossy()
     }
 
     #[inline]
+    #[instrument]
     pub fn query_size(&self) -> usize {
         self.query
             .iter()
@@ -33,16 +37,19 @@ impl SigningContext {
 
     /// Push a new query pair into query list.
     #[inline]
+    #[instrument]
     pub fn query_push(&mut self, key: impl Into<String>, value: impl Into<String>) {
         self.query.push((key.into(), value.into()));
     }
 
     /// Push a query string into query list.
     #[inline]
+    #[instrument]
     pub fn query_append(&mut self, query: &str) {
         self.query.push((query.to_string(), "".to_string()));
     }
 
+    #[instrument]
     pub fn query_to_vec_with_filter(&self, filter: impl Fn(&str) -> bool) -> Vec<(String, String)> {
         self.query
             .iter()
@@ -58,6 +65,7 @@ impl SigningContext {
     /// ```shell
     /// [(a, b), (c, d)] => "a:b\nc:d"
     /// ```
+    #[instrument]
     pub fn query_to_string(mut query: Vec<(String, String)>, sep: &str, join: &str) -> String {
         let mut s = String::with_capacity(16);
 
@@ -84,6 +92,7 @@ impl SigningContext {
     /// ```shell
     /// [(a, b), (c, d)] => "a:b\nc:d"
     /// ```
+    #[instrument]
     pub fn query_to_percent_decoded_string(
         mut query: Vec<(String, String)>,
         sep: &str,
@@ -110,6 +119,7 @@ impl SigningContext {
     }
 
     #[inline]
+    #[instrument]
     pub fn header_get_or_default(&self, key: &HeaderName) -> Result<&str> {
         match self.headers.get(key) {
             Some(v) => Ok(v.to_str()?),
@@ -117,6 +127,7 @@ impl SigningContext {
         }
     }
 
+    #[instrument]
     pub fn header_value_normalize(v: &mut HeaderValue) {
         let bs = v.as_bytes();
 
@@ -129,6 +140,7 @@ impl SigningContext {
             .expect("invalid header value")
     }
 
+    #[instrument]
     pub fn header_name_to_vec_sorted(&self) -> Vec<&str> {
         let mut h = self
             .headers
@@ -140,6 +152,7 @@ impl SigningContext {
         h
     }
 
+    #[instrument]
     pub fn header_to_vec_with_prefix(&self, prefix: &str) -> Vec<(String, String)> {
         self.headers
             .iter()
@@ -160,6 +173,7 @@ impl SigningContext {
     /// ```shell
     /// [(a, b), (c, d)] => "a:b\nc:d"
     /// ```
+    #[instrument]
     pub fn header_to_string(mut headers: Vec<(String, String)>, sep: &str, join: &str) -> String {
         let mut s = String::with_capacity(16);
 
@@ -181,7 +195,7 @@ impl SigningContext {
 }
 
 /// SigningMethod is the method that used in signing.
-#[derive(Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum SigningMethod {
     /// Signing with header.
     Header,

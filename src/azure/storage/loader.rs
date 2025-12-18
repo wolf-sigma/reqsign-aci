@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 
 use anyhow::Result;
+use tracing::instrument;
 
 use crate::time::{now, parse_rfc3339};
 
@@ -19,6 +20,7 @@ pub struct Loader {
 
 impl Loader {
     /// Create a new loader via config.
+    #[instrument]
     pub fn new(config: Config) -> Self {
         Self {
             config,
@@ -28,6 +30,7 @@ impl Loader {
     }
 
     /// Load credential.
+    #[instrument(skip(self))]
     pub async fn load(&self) -> Result<Option<Credential>> {
         // Return cached credential if it's valid.
         match self.credential.lock().expect("lock poisoned").clone() {
@@ -42,6 +45,7 @@ impl Loader {
         Ok(cred)
     }
 
+    #[instrument(skip(self))]
     async fn load_inner(&self) -> Result<Option<Credential>> {
         if let Some(cred) = self.load_via_config().await? {
             return Ok(Some(cred));
@@ -61,6 +65,7 @@ impl Loader {
         self.load_via_imds().await
     }
 
+    #[instrument(skip(self))]
     async fn load_via_config(&self) -> Result<Option<Credential>> {
         if let Some(token) = &self.config.sas_token {
             let cred = Credential::SharedAccessSignature(token.clone());
@@ -75,6 +80,7 @@ impl Loader {
         Ok(None)
     }
 
+    #[instrument(skip(self))]
     async fn load_via_imds(&self) -> Result<Option<Credential>> {
         let token =
             imds_credential::get_access_token("https://storage.azure.com/", &self.config).await?;
@@ -88,6 +94,7 @@ impl Loader {
         Ok(cred)
     }
 
+    #[instrument(skip(self))]
     async fn load_via_workload_identity(&self) -> Result<Option<Credential>> {
         let workload_identity_token =
             workload_identity_credential::get_workload_identity_token(&self.config).await?;
@@ -106,6 +113,7 @@ impl Loader {
         }
     }
 
+    #[instrument(skip(self))]
     async fn load_via_client_secret(&self) -> Result<Option<Credential>> {
         super::client_secret_credential::get_client_secret_token(&self.config)
             .await

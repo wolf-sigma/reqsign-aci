@@ -3,7 +3,7 @@ use std::str;
 use http::HeaderValue;
 use http::Method;
 use http::Request;
-use log::debug;
+use log::{debug, info};
 use reqwest::Client;
 use reqwest::Url;
 use serde::Deserialize;
@@ -25,7 +25,7 @@ pub async fn get_access_token(resource: &str, config: &Config) -> anyhow::Result
         config.client_id.as_deref()
     );
     let mut query_items = vec![("api-version", MSI_API_VERSION), ("resource", resource)];
-
+    info!("Resource: {resource}\nFull Config: {config:?}");
     match (
         config.object_id.as_ref(),
         config.client_id.as_ref(),

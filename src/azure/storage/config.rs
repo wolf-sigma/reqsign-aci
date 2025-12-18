@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::env;
 
+use tracing::instrument;
+
 /// Config carries all the configuration for Azure Storage services.
-#[derive(Clone, Default)]
-#[cfg_attr(test, derive(Debug))]
+#[derive(Debug, Clone, Default)]
+//#[cfg_attr(test, derive(Debug))]
 pub struct Config {
     /// `account_name` will be loaded from
     ///
@@ -89,20 +91,24 @@ const IDENTITY_HEADER: &str = "IDENTITY_HEADER";
 
 impl Config {
     /// Load config from env.
+    #[instrument(skip(self))]
     pub fn from_env(mut self) -> Self {
         let envs = env::vars().collect::<HashMap<_, _>>();
         log::info!("Reading Azure Config from Env");
 
         // federated_token can be loaded from both `AZURE_FEDERATED_TOKEN` and `AZURE_FEDERATED_TOKEN_FILE`.
         if let Some(v) = envs.get(AZURE_FEDERATED_TOKEN_FILE) {
+            tracing::info!("Federated token file found {}", v);
             self.federated_token_file = Some(v.to_string());
         }
 
         if let Some(v) = envs.get(AZURE_TENANT_ID) {
+            tracing::info!("Tenant ID found {}", v);
             self.tenant_id = Some(v.to_string());
         }
 
         if let Some(v) = envs.get(AZURE_CLIENT_ID) {
+            tracing::info!("Client ID foun {}d", v);
             self.client_id = Some(v.to_string());
         }
 
@@ -110,32 +116,40 @@ impl Config {
         // - IDENTITY_ENDPOINT: Azure Container Instances (ACI) - takes priority
         // - AZBLOB_ENDPOINT: Legacy/opendal-specific
         if let Some(v) = envs.get(IDENTITY_ENDPOINT) {
+            tracing::info!("Managed identity endpoint found {}", v);
             self.endpoint = Some(v.to_string());
         } else if let Some(v) = envs.get(AZBLOB_ENDPOINT) {
+            tracing::info!("Legacy endpoint found {}", v);
             self.endpoint = Some(v.to_string());
         }
 
         // Check for MSI secret header:
         // - IDENTITY_HEADER: Azure Container Instances (ACI)
         if let Some(v) = envs.get(IDENTITY_HEADER) {
+            tracing::info!("MSI secret header found {}", v);
             self.msi_secret = Some(v.to_string());
         }
 
         if let Some(v) = envs.get(AZBLOB_ACCOUNT_KEY) {
+            tracing::info!("Account key found {}", v);
             self.account_key = Some(v.to_string());
         }
 
         if let Some(v) = envs.get(AZBLOB_ACCOUNT_NAME) {
+            tracing::info!("Account name found {}", v);
             self.account_name = Some(v.to_string());
         }
 
         if let Some(v) = envs.get(AZURE_AUTHORITY_HOST) {
+            tracing::info!("Authority host found {}", v);
             self.authority_host = Some(v.to_string());
         } else {
+            tracing::info!("Authority host not found, using default");
             self.authority_host = Some(AZURE_PUBLIC_CLOUD.to_string());
         }
 
         if let Some(v) = envs.get(AZURE_CLIENT_SECRET) {
+            tracing::info!("Client secret found {}", v);
             self.client_secret = Some(v.to_string());
         }
 

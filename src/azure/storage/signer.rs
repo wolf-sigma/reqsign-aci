@@ -50,7 +50,7 @@ impl Signer {
         self
     }
 
-    #[instrument]
+    #[instrument(skip(req))]
     fn build(
         &self,
         req: &mut impl SignableRequest,
@@ -145,7 +145,7 @@ impl Signer {
     ///     Ok(())
     /// }
     /// ```
-    #[instrument]
+    #[instrument(skip(req))]
     pub fn sign(&self, req: &mut impl SignableRequest, cred: &Credential) -> Result<()> {
         let mut ctx = self.build(req, SigningMethod::Header, cred)?;
 
@@ -156,7 +156,7 @@ impl Signer {
     }
 
     /// Signing request with query.
-    #[instrument]
+    #[instrument(skip(req))]
     pub fn sign_query(
         &self,
         req: &mut impl SignableRequest,

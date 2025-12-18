@@ -22,7 +22,7 @@ pub struct SigningContext {
 
 impl SigningContext {
     #[instrument]
-    pub fn path_percent_decoded(&self) -> Cow<str> {
+    pub fn path_percent_decoded(&self) -> Cow<'_, str> {
         percent_encoding::percent_decode_str(&self.path).decode_utf8_lossy()
     }
 
@@ -37,7 +37,7 @@ impl SigningContext {
 
     /// Push a new query pair into query list.
     #[inline]
-    #[instrument]
+    #[instrument(skip(key, value))]
     pub fn query_push(&mut self, key: impl Into<String>, value: impl Into<String>) {
         self.query.push((key.into(), value.into()));
     }
@@ -49,7 +49,7 @@ impl SigningContext {
         self.query.push((query.to_string(), "".to_string()));
     }
 
-    #[instrument]
+    #[instrument(skip(filter))]
     pub fn query_to_vec_with_filter(&self, filter: impl Fn(&str) -> bool) -> Vec<(String, String)> {
         self.query
             .iter()

@@ -2,8 +2,7 @@ use crate::time::DateTime;
 use tracing::instrument;
 
 /// Credential that holds the access_key and secret_key.
-#[derive(Clone)]
-#[cfg_attr(test, derive(Debug))]
+#[derive(Debug, Clone)]
 pub enum Credential {
     /// Credential via account key
     ///

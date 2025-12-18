@@ -20,9 +20,13 @@ const MSI_ENDPOINT: &str = "http://localhost:12356/msi/token";
 #[instrument]
 pub async fn get_access_token(resource: &str, config: &Config) -> anyhow::Result<AccessToken> {
     let mut config = config.clone();
-    if let Some(sec) = config.msi_secret {
-        
+    if let None = &config.msi_secret {
+        tracing::info!("msi_secret not set in config; reading from env MSI_SECRET");
+        let msi_sec_env = std::env::var("MSI_SECRET").ok();
+        tracing::info!("Env value: {msi_sec_env:?}");
+        config.msi_secret = msi_sec_env.clone();
     }
+
     let endpoint = config.endpoint.as_deref().unwrap_or_else(|| {
         tracing::warn!("MSI_ENDPOINT not set, falling back to {MSI_ENDPOINT}");
         MSI_ENDPOINT
